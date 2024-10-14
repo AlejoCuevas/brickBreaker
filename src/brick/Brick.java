@@ -21,7 +21,7 @@ public class Brick {
 
     public void draw(Graphics g) {
         if(esVisible) {
-            g.setColor(Color.GREEN);
+            g.setColor(Color.RED);
             g.fillRect(x, y, width, height);
         }
     }

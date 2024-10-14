@@ -1,7 +1,6 @@
 package paddle;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
 
 public class Paddle {
@@ -9,6 +8,9 @@ public class Paddle {
     private int x, y;
     private final int width = 100;
     private final int height = 10;
+
+    int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+    int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 
     public Paddle(int x, int y) {
 
@@ -27,7 +29,7 @@ public class Paddle {
     }
 
     public void moverDerecha() {
-        if (x< 600 - width) {
+        if (x<screenWidth  - width) {
 
             x += 20;
         }
@@ -35,7 +37,7 @@ public class Paddle {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
+        g.setColor(Color.WHITE);
         g.fillRect(x, y, width, height);
 
     }

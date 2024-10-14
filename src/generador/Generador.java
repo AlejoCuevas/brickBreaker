@@ -10,13 +10,16 @@ public class Generador {
     private Brick[][] mapa;
     private int fila, columna;
 
-    public Generador(int fila, int columna) {
+    int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+    int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+
+    public Generador(int fila) {
         this.fila = fila;
-        this.columna = columna;
+        this.columna = screenWidth / 60;
         mapa = new Brick[fila][columna];
         for(int i = 0; i < fila; i++) {
             for(int j = 0; j < columna; j++) {
-                mapa[i][j] = new Brick(j * 60 + 50, i * 30 + 50, 60, 30);
+                mapa[i][j] = new Brick(j * 60 + 10, i * 30 + 50, 60, 30);
             }
 
         }

@@ -19,12 +19,25 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private Paddle paddle;
     private Generador mapa;
     private Boolean play = false;
+    private GraphicsDevice graphicsDevice;
 
     public Game () {
 
-        ball = new Ball(120, 350);
-        paddle = new Paddle(300, 550);
-        mapa = new Generador(5, 8);
+        ball = new Ball(0,0);
+        paddle = new Paddle(0,0);
+
+        int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+
+        int ballStartX = (screenWidth - ball.getDiametro()) / 2;
+        int ballStartY = (screenHeight - ball.getDiametro()) / 2;
+
+        int paddleStartX = (screenWidth - paddle.getWidth()) / 2;
+        int paddleStartY = (screenHeight - 108);
+
+        ball = new Ball(ballStartX, ballStartY);
+        paddle = new Paddle(paddleStartX, paddleStartY);
+        mapa = new Generador(5);
 
 
     addKeyListener(this);
@@ -33,12 +46,30 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     timer = new Timer(8, this);
     timer.start();
+
+    setFullscreen();
+    }
+
+    private void setFullscreen() {
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        graphicsDevice = ge.getDefaultScreenDevice();
+
+        JFrame frame = new JFrame();
+        frame.setUndecorated(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(this);
+        frame.setVisible(true);
+
+        graphicsDevice.setFullScreenWindow(frame);
+        frame.setResizable(false);
+
     }
 
     public void paint(Graphics g) {
         // Fondo
-        g.setColor(Color.BLACK);
-        g.fillRect(1, 1, 692, 592);
+        g.setColor(Color.BLUE);
+        g.fillRect(1, 1, getWidth(), getHeight());
 
         // Dibujar componentes
         ball.draw(g);
@@ -77,8 +108,10 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
                         // Eliminar el ladrillo
                         brick.setVisible(false);
-                        // Invertir la dirección de la bola
+                        // Invertir la dirección de la pelota
                         ball.reverseYDir();
+                        // Aumentar velocidad de la pelota
+                        ball.aumentarVelocidad();
                         break; // Rompe el bucle para evitar múltiples colisiones en un solo movimiento
                     }
                 }
@@ -107,14 +140,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     public void keyTyped(KeyEvent e) {}
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        Game game = new Game();
-        frame.setBounds(10, 10, 700, 600);
-        frame.setTitle("BrickBreaker");
-        frame.setResizable(false);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(game);
+        new Game();
     }
 
 }
