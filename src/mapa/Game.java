@@ -23,19 +23,16 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     public Game () {
 
-        ball = new Ball(0,0);
+
         paddle = new Paddle(0,0);
 
         int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
         int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 
-        int ballStartX = (screenWidth - ball.getDiametro()) / 2;
-        int ballStartY = (screenHeight - ball.getDiametro()) / 2;
-
         int paddleStartX = (screenWidth - paddle.getWidth()) / 2;
         int paddleStartY = (screenHeight - 108);
 
-        ball = new Ball(ballStartX, ballStartY);
+        ball = new Ball(500, 300);
         paddle = new Paddle(paddleStartX, paddleStartY);
         mapa = new Generador(5);
 
@@ -86,7 +83,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             ball.mover();
 
             // Detectar colisiones con los bordes
-            if (ball.getX() < 0 || ball.getX() > 670) {
+            if (ball.getX() < 0 || ball.getX() > getWidth()) {
                 ball.reverseXDir();
             }
             if (ball.getY() < 0) {
