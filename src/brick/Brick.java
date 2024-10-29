@@ -20,8 +20,10 @@ public class Brick {
 
     public void draw(Graphics g) {
         if (esVisible) {
-            g.setColor(esIndestructible ? Color.GRAY : Color.RED); // Color gris si es indestructible
+            g.setColor(esIndestructible ? Color.GRAY : Color.RED);
             g.fillRect(x, y, width, height);
+        } else {
+            System.out.println("Dibujar ladrillo oculto en: " + x + ", " + y);
         }
     }
 
@@ -31,7 +33,7 @@ public class Brick {
         }
     }
 
-    public boolean isVisible() {
+    public boolean esVisible() {
         return esVisible;
     }
 

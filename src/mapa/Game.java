@@ -4,6 +4,7 @@ import ball.Ball;
 import brick.Brick;
 import generador.Generador;
 import paddle.Paddle;
+import powerup.PowerUp;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,10 +22,15 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private Generador mapa;
     private boolean play = false;
     private GraphicsDevice graphicsDevice;
+    private ArrayList<PowerUp> powerUps;
+    private Paddle extraPaddle;
 
     private int score = 0; // Puntuación del jugador
 
     public Game() {
+
+        powerUps = new ArrayList<>();
+        extraPaddle = null;
         balls = new ArrayList<>();
         balls.add(new Ball(500, 300)); // Añadir la primera pelota inicial
 
@@ -77,6 +83,14 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             paddle.draw(g);
             mapa.draw(g);
 
+        for (PowerUp powerUp : powerUps) {
+            powerUp.draw(g);
+        }
+        if (extraPaddle != null) {
+            extraPaddle.draw(g);
+        }
+
+
             // Mostrar puntuación
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 30));
@@ -88,7 +102,6 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (play) {
             ArrayList<Ball> newBalls = new ArrayList<>();
-
             for (Ball ball : balls) {
                 ball.mover();
 
@@ -105,13 +118,15 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 Rectangle paddleRect = new Rectangle(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
 
                 if (ballRect.intersects(paddleRect)) {
-                    ball.reverseYDir(); // Invertir dirección vertical
-                    int paddleCenter = paddle.getX() + paddle.getWidth() / 2;
-                    int impactPoint = ball.getX() + ball.getDiametro() / 2;
-                    int distanceFromCenter = impactPoint - paddleCenter;
-                    double angleFactor = 0.05; // Controla cuánto afecta el impacto al ángulo
-                    ball.setxDir((int) (distanceFromCenter * angleFactor));
-                    ball.aumentarVelocidad();
+                    controlarColision(ball, paddle);
+                }
+
+                // Detectar colisión con la pala extra
+                if (extraPaddle != null) {
+                    Rectangle extraPaddleRect = new Rectangle(extraPaddle.getX(), extraPaddle.getY(), extraPaddle.getWidth(), extraPaddle.getHeight());
+                    if (ballRect.intersects(extraPaddleRect)) {
+                        controlarColision(ball, extraPaddle);
+                    }
                 }
 
                 // Detectar colisión con ladrillos
@@ -119,29 +134,79 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 for (int i = 0; i < mapa.getMapa().length; i++) {
                     for (int j = 0; j < mapa.getMapa()[0].length; j++) {
                         Brick brick = mapa.getMapa()[i][j];
-                        if (brick != null && brick.isVisible() && ballRect.intersects(new Rectangle(brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight()))) {
+                        if (brick != null && brick.esVisible() && ballRect.intersects(new Rectangle(brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight()))) {
+                            // Si no es indestructible, se elimina
                             if (!brick.esIndestructible()) {
-                                brick.setVisible(false);
+                                brick.setVisible(false); // Eliminar ladrillo
+                                System.out.println("Bloque eliminado: " + brick.getX() + ", " + brick.getY());
                                 score += 10; // Incrementar puntuación
-                                ball.reverseYDir();
-                                ball.aumentarVelocidad();
+                                ball.reverseYDir(); // Cambiar dirección de la bola
+                                ball.aumentarVelocidad(); // Aumentar velocidad
                                 newBalls.add(new Ball(ball.getX(), ball.getY()));
-                                hitBrick = true; // Marcamos que hemos golpeado un ladrillo
+                                hitBrick = true; // Marcar que se ha golpeado un ladrillo
+                                // Generar power-up con probabilidad de 30%
+                                if (hitBrick && Math.random() < 0.3) {
+                                    powerUps.add(new PowerUp(ball.getX(), ball.getY()));
+                                }
                             } else {
                                 ball.reverseYDir(); // Rebota sin eliminar si es indestructible
                             }
-                            break;
+
+                            break; // Salir del bucle de ladrillos, ya que se ha manejado la colisión
                         }
                     }
                 }
+
             }
+
+
 
             // Añadir nuevas pelotas creadas al romper bloques
             balls.addAll(newBalls);
 
+            for (PowerUp powerUp : powerUps) {
+                if (powerUp.esActivo()) {
+                    powerUp.moverAbajo();
+                    Rectangle paddleRect = new Rectangle(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
+
+                    if (powerUp.getBounds().intersects(paddleRect)) {
+                        powerUp.desactivar();
+                        activarPowerUp();
+                    }
+                }
+            }
+
+            // Movimiento sincronizado de la pala extra
+            if (extraPaddle != null) {
+                extraPaddle.setX(paddle.getX() + paddle.getWidth() + 10); // Colocación a la derecha de la pala
+            }
+
             repaint();
         }
     }
+
+    private void activarPowerUp() {
+
+        if(extraPaddle == null) {
+
+            extraPaddle = new Paddle(paddle.getX() + paddle.getWidth(), paddle.getY());
+
+        }
+
+    }
+
+    private void controlarColision(Ball ball, Paddle paddle) {
+        ball.reverseYDir();
+        int paddleCenter = paddle.getX() + paddle.getWidth() / 2;
+        int impactPoint = ball.getX() + ball.getDiametro() / 2;
+        int distanceFromCenter = impactPoint - paddleCenter;
+        double angleFactor = 0.05;
+        ball.setxDir((int) (distanceFromCenter * angleFactor));
+        ball.aumentarVelocidad();
+
+    }
+
+
 
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {

@@ -31,7 +31,7 @@ public class Ball {
     }
 
     public void aumentarVelocidad() {
-        velocidad *= 1.1; // Aumenta más rápido
+        velocidad *= 1.4; // Aumenta más rápido
     }
 
     public void draw(Graphics g) {

@@ -1,34 +1,39 @@
 package powerup;
 
 import java.awt.*;
-import java.util.Random;
 
 public class PowerUp {
-
     private int x, y;
-    private final int width = 30;
-    private final int height = 30;
-    private int ySpeed = 2;
+    private final int width = 20;
+    private final int height = 20;
+    private boolean esActivo;
 
     public PowerUp(int x, int y) {
         this.x = x;
         this.y = y;
+        this.esActivo = true;
     }
 
-    public void mover() {
-        y += ySpeed; // Mueve el power-up hacia abajo
+    public void moverAbajo() {
+        y += 2; // Velocidad de caída
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.GREEN);
-        g.fillOval(x, y, width, height);
+        if (esActivo) {
+            g.setColor(Color.GREEN); // Color del power-up
+            g.fillRect(x, y, width, height);
+        }
     }
 
     public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
     }
 
-    public int getY() {
-        return y;
+    public void desactivar() {
+        esActivo = false;
+    }
+
+    public boolean esActivo() {
+        return esActivo;
     }
 }

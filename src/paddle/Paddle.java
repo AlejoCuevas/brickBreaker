@@ -7,7 +7,7 @@ public class Paddle {
 
     private int x, y;
     private final int width = 100;
-    private final int height = 10;
+    private final int height = 30;
 
     int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
     int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -56,5 +56,9 @@ public class Paddle {
 
     public int getHeight() {
         return height;
+    }
+
+    public void setX(int x) {
+        this.x = x;
     }
 }

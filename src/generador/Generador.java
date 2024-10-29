@@ -34,7 +34,7 @@ public class Generador {
     public void draw(Graphics g) {
         for (int i = 0; i < fila; i++) {
             for (int j = 0; j < columna; j++) {
-                if (mapa[i][j] != null && mapa[i][j].isVisible()) {
+                if (mapa[i][j] != null && mapa[i][j].esVisible()) {
                     mapa[i][j].draw(g);
                 }
             }
