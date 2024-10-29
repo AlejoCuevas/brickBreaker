@@ -1,7 +1,6 @@
 package brick;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
 public class Brick {
 
@@ -55,5 +54,9 @@ public class Brick {
 
     public int getHeight() {
         return height;
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
     }
 }

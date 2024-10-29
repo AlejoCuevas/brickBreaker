@@ -2,11 +2,11 @@ package powerup;
 
 import java.awt.*;
 
-public class PowerUp {
-    private int x, y;
-    private final int width = 20;
-    private final int height = 20;
-    private boolean esActivo;
+public abstract class PowerUp {
+    protected int x, y;
+    protected final int width = 20;
+    protected final int height = 20;
+    protected boolean esActivo;
 
     public PowerUp(int x, int y) {
         this.x = x;
@@ -20,7 +20,7 @@ public class PowerUp {
 
     public void draw(Graphics g) {
         if (esActivo) {
-            g.setColor(Color.GREEN); // Color del power-up
+            g.setColor(getColor()); // Color específico del power-up
             g.fillRect(x, y, width, height);
         }
     }
@@ -36,4 +36,8 @@ public class PowerUp {
     public boolean esActivo() {
         return esActivo;
     }
+
+    protected abstract Color getColor(); // Método para obtener el color del power-up
+
+    public abstract void activar(); // Método para activar el efecto del power-up
 }
