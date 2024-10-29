@@ -1,34 +1,40 @@
 package generador;
 
 import brick.Brick;
-
 import java.awt.*;
+import java.util.Random;
 
 public class Generador {
 
     private Brick[][] mapa;
     private int fila, columna;
-
     int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
 
-    public Generador(int fila) {
-        this.fila = fila;
+    public Generador(int nivel) {
+        // Ajustar el número de filas y columnas según el nivel
+        if (nivel == 3 || nivel == 4) {
+            this.fila = (int) (screenWidth / 60) / 2; // Alcanzar la mitad de la pantalla
+        } else {
+            this.fila = 5 + nivel;
+        }
         this.columna = screenWidth / 60;
         mapa = new Brick[fila][columna];
-        int mitad = columna / 2;
+        Random random = new Random();
 
+        // Generación aleatoria de bloques
         for (int i = 0; i < fila; i++) {
             for (int j = 0; j < columna; j++) {
-                // La última fila es indestructible y no tendrá bloques en el centro y en los laterales
-                if (i == fila - 1 && (j == mitad - 1 || j == mitad - 2 || j == mitad)) {
-                    mapa[i][j] = null; // Sin bloque en el centro y los adyacentes
-                } else {
-                    boolean esIndestructible = (i == fila - 1); // La última fila es indestructible
+                // Determina si el bloque es destructible o indestructible
+                boolean esIndestructible = (i == fila - 1) || (random.nextDouble() < 0.50); // 75% de probabilidad de ser indestructible
+
+                // Se generan bloques aleatorios
+                if (random.nextBoolean()) { // 50% de probabilidad de generar un bloque
                     mapa[i][j] = new Brick(j * 60 + 10, i * 30 + 50, 60, 30, esIndestructible);
+                } else {
+                    mapa[i][j] = null; // Sin bloque
                 }
             }
         }
-
     }
 
     public void draw(Graphics g) {
@@ -39,6 +45,17 @@ public class Generador {
                 }
             }
         }
+    }
+
+    public boolean noQuedanBloquesRojos() {
+        for (Brick[] row : mapa) {
+            for (Brick brick : row) {
+                if (brick != null && brick.esRojo()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public Brick[][] getMapa() {

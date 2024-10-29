@@ -12,12 +12,12 @@ public class CannonBall extends Ball {
 
     @Override
     public void mover() {
-        // Actualiza directamente la posición y
-        setY(getY() + ySpeed); // Asumiendo que 'y' es una variable accesible en esta clase
+
+        setY(getY() + ySpeed);
     }
 
     public void disparar() {
-        ySpeed = -10; // Asegúrate de que la bola se mueve hacia arriba
+        ySpeed = -10;
     }
 
     @Override

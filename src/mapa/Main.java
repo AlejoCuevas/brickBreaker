@@ -5,21 +5,20 @@ import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-        // Crear un JFrame
         JFrame frame = new JFrame("BrickBreaker");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setUndecorated(true); // Sin bordes
-        frame.setResizable(false); // No redimensionable
+        frame.setUndecorated(true);
+        frame.setResizable(false);
 
-        // Configurar el JFrame para pantalla completa
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice graphicsDevice = ge.getDefaultScreenDevice();
 
-        // Establecer a pantalla completa
         graphicsDevice.setFullScreenWindow(frame);
 
-        Menu menu = new Menu(); // Crear el menú
-        frame.add(menu); // Añadir el menú al frame
+        Menu menu = new Menu();
+        frame.add(menu);
+
+        Game game = new Game(frame, 1); // Pasar el frame al juego
         frame.setVisible(true); // Hacer visible el frame
     }
 }

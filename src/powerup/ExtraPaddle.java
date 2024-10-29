@@ -15,6 +15,5 @@ public class ExtraPaddle extends PowerUp {
 
     @Override
     public void activar() {
-        // Lógica específica al activar el power-up
     }
 }

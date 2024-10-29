@@ -24,6 +24,8 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private Paddle extraPaddle;
 
 
+    private JFrame frame;
+
     private int score = 0; // Puntuación del jugador
 
     private Timer ralentizarTiempo;
@@ -33,20 +35,29 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private boolean cannonBallActive = false;
 
 
-    public Game() {
+    public Game(JFrame frame, int nivel) {
+        this.frame = frame;
         powerUps = new ArrayList<>();
         extraPaddle = null;
         balls = new ArrayList<>();
-        balls.add(new Ball(500, 300)); // Añadir la primera pelota inicial
+
+        // Posición inicial de la pelota
+        int ballStartY;
+        if (nivel == 3 || nivel == 4) {
+            ballStartY = 600;
+        } else {
+            ballStartY = 300; // Valor original para niveles 1 y 2
+        }
+        balls.add(new Ball(500, ballStartY)); // Añadir la primera pelota inicial
 
         int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
         int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 
         int paddleStartX = (screenWidth - Paddle.WIDTH) / 2;
-        int paddleStartY = (screenHeight - 108);
+        int paddleStartY = (screenHeight - 108); // Posicion de la paleta
 
         paddle = new Paddle(paddleStartX, paddleStartY);
-        mapa = new Generador(5);
+        mapa = new Generador(nivel);
 
         addKeyListener(this);
         setFocusable(true);
@@ -92,7 +103,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void paint(Graphics g) {
-        super.paint(g); // Llama a la implementación de paint de JPanel para limpiar el lienzo
+        super.paint(g); // Llama a paint de JPanel para limpiar
 
         // Fondo
         g.setColor(Color.BLUE);
@@ -126,16 +137,15 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (play) {
             ArrayList<Ball> newBalls = new ArrayList<>();
-            for (Ball ball : balls) {
+            for (int i = 0; i < balls.size(); i++) {
+                Ball ball = balls.get(i);
                 ball.mover();
 
-                if (cannonBallActive && cannonBall != null) {
-                    // Mover la bola del cañón si está activa
-                    cannonBall.mover();
-                    if (cannonBall.getY() < 0) {
-                        cannonBallActive = false; // Si la bola sale de la pantalla, desactivarla
-                        cannonBall = null; // Limpiar la referencia
-                    }
+                if (ball.getY() > getHeight()) {
+                    System.out.println("Pelota fuera de la pantalla. Eliminando la pelota.");
+                    balls.remove(i); // Eliminar la pelota de la lista
+                    i--; // Ajustar el índice para evitar ConcurrentModificationException
+                    continue; // Ir a la siguiente pelota
                 }
 
                 // Detectar colisiones con los bordes
@@ -163,25 +173,29 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 }
 
                 // Detectar colisión con ladrillos
-                boolean hitBrick = false;
-                for (int i = 0; i < mapa.getMapa().length; i++) {
-                    for (int j = 0; j < mapa.getMapa()[0].length; j++) {
-                        Brick brick = mapa.getMapa()[i][j];
+                for (int j = 0; j < mapa.getMapa().length; j++) {
+                    for (int k = 0; k < mapa.getMapa()[0].length; k++) {
+                        Brick brick = mapa.getMapa()[j][k];
                         if (brick != null && brick.esVisible() && ballRect.intersects(new Rectangle(brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight()))) {
-                            // Si no es indestructible, se elimina
                             if (!brick.esIndestructible()) {
                                 brick.setVisible(false); // Eliminar ladrillo
                                 System.out.println("Bloque eliminado: " + brick.getX() + ", " + brick.getY());
                                 score += 10; // Incrementar puntuación
                                 ball.reverseYDir(); // Cambiar dirección de la bola
                                 ball.aumentarVelocidad(); // Aumentar velocidad
-                                newBalls.add(new Ball(ball.getX(), ball.getY()));
-                                hitBrick = true; // Marcar que se ha golpeado un ladrillo
+
+                                // Generar nueva pelota con una probabilidad del 25%
+                                if (Math.random() < 0.25) { // 25% de probabilidad
+                                    newBalls.add(new Ball(ball.getX(), ball.getY())); // Crear nueva pelota
+                                }
+
                                 // Generar power-up con probabilidad de 30%
                                 if (Math.random() < 0.3) {
                                     powerUps.add(generarPowerUp(ball.getX(), ball.getY()));
                                 }
                             } else {
+                                // Si es indestructible, registrar el impacto
+                                brick.impactar(i);
                                 ball.reverseYDir(); // Rebota sin eliminar si es indestructible
                             }
 
@@ -191,13 +205,15 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 }
             }
 
+            // posición sincronizada para la pala extra
             if (extraPaddle != null) {
-                extraPaddle.setX(paddle.getX() + paddle.getWidth() + 5); // Ajuste de posición sincronizado
+                extraPaddle.setX(paddle.getX() + paddle.getWidth() + 5);
             }
 
             // Añadir nuevas pelotas creadas al romper bloques
             balls.addAll(newBalls);
 
+            // Manejo de power-ups
             for (PowerUp powerUp : powerUps) {
                 if (powerUp.esActivo()) {
                     powerUp.moverAbajo();
@@ -210,16 +226,37 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 }
             }
 
+            // Comprobar si no quedan bloques rojos
+            boolean allRedBlocksDestroyed = mapa.noQuedanBloquesRojos();
+            if (allRedBlocksDestroyed) {
+                regresarAlMenu(); // regresa al menu
+            }
 
-
-
+            // Comprobar si no quedan pelotas
+            if (balls.isEmpty()) {
+                System.out.println("No quedan pelotas. Cerrando el juego.");
+                play = false; // Detener el juego
+                timer.stop();
+                frame.dispose(); // Cierra la ventana de juego
+                System.exit(0); // Sale de la aplicación
+            }
 
             repaint();
         }
     }
 
+
+    private void regresarAlMenu() {
+        frame.remove(this); // Elimina el juego actual
+        frame.add(new Menu()); // Agrega el menú principal
+        frame.revalidate();
+        frame.repaint();
+        timer.stop();
+        play = false; // Detiene el juego
+    }
+
     private PowerUp generarPowerUp(int x, int y) {
-        int powerUpType = (int) (Math.random() * 5); // Suponiendo que tienes 4 tipos de power-ups
+        int powerUpType = (int) (Math.random() * 5); // El valor cambia dependiendo la cantidad de PowerUps
 
         switch (powerUpType) {
             case 0:
@@ -230,10 +267,10 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 return new CanonDeRebote(x, y);
             case 3:
                 return new RalentizarTiempo(x, y);
-            case 4: // Nuevo caso para el ExtraPaddle
+            case 4:
                 return new ExtraPaddle(x, y);
             default:
-                return null; // No debería llegar aquí
+                return null;
         }
     }
 
@@ -245,16 +282,16 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             }
         }
         if (powerUp instanceof RemocionDeBloques) {
-            // Implementar lógica de Remoción de Bloques
+            // lógica de Remoción de Bloques
         } else if (powerUp instanceof AtraccionMagnetica) {
             cannonBall = new CannonBall(paddle.getX() + (paddle.getWidth() / 2) - (CannonBall.DIAMETRO / 2), paddle.getY() - CannonBall.DIAMETRO);
             cannonBallActive = false; // Mantenerla inactiva al principio
             System.out.println("Activando Atracción Magnética.");
         } else if (powerUp instanceof CanonDeRebote) {
-            // Implementar lógica de Cañón de Rebote
+            // lógica de Cañón de Rebote
         } else if (powerUp instanceof RalentizarTiempo) {
             activarRalentizarTiempo();
-            // Implementar lógica de Ralentizar el tiempo
+            // lógica de Ralentizar el tiempo
         }
         powerUp.activar(); // Activar el power-up
     }
@@ -322,9 +359,4 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void keyTyped(KeyEvent e) {}
-
-
-
-
-
 }

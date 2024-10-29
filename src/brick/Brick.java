@@ -1,12 +1,13 @@
 package brick;
 
 import java.awt.*;
+import java.util.HashMap;
 
 public class Brick {
-
     private int x, y, width, height;
     private boolean esVisible;
     private boolean esIndestructible; // Indica si el ladrillo es indestructible
+    private HashMap<Integer, Integer> impactosPorPelota; // Contador de impactos por cada pelota
 
     public Brick(int x, int y, int width, int height, boolean esIndestructible) {
         this.x = x;
@@ -15,6 +16,7 @@ public class Brick {
         this.height = height;
         this.esVisible = true;
         this.esIndestructible = esIndestructible;
+        this.impactosPorPelota = new HashMap<>(); // Inicializa el mapa de impactos
     }
 
     public void draw(Graphics g) {
@@ -56,7 +58,21 @@ public class Brick {
         return height;
     }
 
+    public boolean esRojo() {
+        return esVisible && !esIndestructible;
+    }
+
     public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
+    }
+
+    public void impactar(int ballId) {
+        if (esIndestructible) {
+            impactosPorPelota.put(ballId, impactosPorPelota.getOrDefault(ballId, 0) + 1); // Incrementa el contador por pelota
+            if (impactosPorPelota.get(ballId) >= 3) {
+                esVisible = false; // Rompe el ladrillo después de 3 impactos por la misma pelota
+                System.out.println("Ladrillo indestructible roto en: " + x + ", " + y);
+            }
+        }
     }
 }
