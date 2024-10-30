@@ -18,7 +18,6 @@ public class CanonDeRebote extends PowerUp {
     public void activar() {
         // Lógica para activar el cañón de rebote
         System.out.println("Cañón de Rebote activado.");
-        // Aquí puedes implementar el cañón que lanza nuevas bolas
     }
 
 }

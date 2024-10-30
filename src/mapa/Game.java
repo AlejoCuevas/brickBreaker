@@ -136,7 +136,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (play) {
-            ArrayList<Ball> newBalls = new ArrayList<>();
+            ArrayList<Ball> newBalls = new ArrayList<>(); // Almacena pelotas que despues se van a generar
             for (int i = 0; i < balls.size(); i++) {
                 Ball ball = balls.get(i);
                 ball.mover();
@@ -144,7 +144,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 if (ball.getY() > getHeight()) {
                     System.out.println("Pelota fuera de la pantalla. Eliminando la pelota.");
                     balls.remove(i); // Eliminar la pelota de la lista
-                    i--; // Ajustar el índice para evitar ConcurrentModificationException
+                    i--;
                     continue; // Ir a la siguiente pelota
                 }
 
@@ -156,7 +156,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                     ball.reverseYDir();
                 }
 
-                // Detectar colisión con la pala
+                // Detectar colisión con la pala "hitbox"
                 Rectangle ballRect = new Rectangle(ball.getX(), ball.getY(), ball.getDiametro(), ball.getDiametro());
                 Rectangle paddleRect = new Rectangle(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
 
@@ -164,7 +164,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                     controlarColision(ball, paddle);
                 }
 
-                // Detectar colisión con la pala extra
+                // Detectar colisión con la pala extra "hitbox"
                 if (extraPaddle != null) {
                     Rectangle extraPaddleRect = new Rectangle(extraPaddle.getX(), extraPaddle.getY(), extraPaddle.getWidth(), extraPaddle.getHeight());
                     if (ballRect.intersects(extraPaddleRect)) {
@@ -185,12 +185,12 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                                 ball.aumentarVelocidad(); // Aumentar velocidad
 
                                 // Generar nueva pelota con una probabilidad del 25%
-                                if (Math.random() < 0.25) { // 25% de probabilidad
+                                if (Math.random() < 0.50) { // 25% de probabilidad
                                     newBalls.add(new Ball(ball.getX(), ball.getY())); // Crear nueva pelota
                                 }
 
                                 // Generar power-up con probabilidad de 30%
-                                if (Math.random() < 0.3) {
+                                if (Math.random() < 1) {
                                     powerUps.add(generarPowerUp(ball.getX(), ball.getY()));
                                 }
                             } else {
@@ -219,9 +219,18 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                     powerUp.moverAbajo();
                     Rectangle paddleRect = new Rectangle(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
 
+            // Colision de powerup con pala 1
                     if (powerUp.getBounds().intersects(paddleRect)) {
                         powerUp.desactivar();
                         activarPowerUp(powerUp);
+                    }
+            //Colision de powerup con pala 2
+                    if (extraPaddle != null) {
+                        Rectangle extraPaddleRect = new Rectangle(extraPaddle.getX(), extraPaddle.getY(), extraPaddle.getWidth(), extraPaddle.getHeight());
+                        if (powerUp.getBounds().intersects(extraPaddleRect)) {
+                            powerUp.desactivar();
+                            activarPowerUp(powerUp);
+                        }
                     }
                 }
             }
@@ -234,11 +243,8 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
             // Comprobar si no quedan pelotas
             if (balls.isEmpty()) {
-                System.out.println("No quedan pelotas. Cerrando el juego.");
-                play = false; // Detener el juego
-                timer.stop();
-                frame.dispose(); // Cierra la ventana de juego
-                System.exit(0); // Sale de la aplicación
+                System.out.println("No quedan pelotas. Regresando al menú.");
+                regresarAlMenu(); // Regresar al menú principal
             }
 
             repaint();
@@ -282,11 +288,18 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             }
         }
         if (powerUp instanceof RemocionDeBloques) {
-            // lógica de Remoción de Bloques
+
         } else if (powerUp instanceof AtraccionMagnetica) {
-            cannonBall = new CannonBall(paddle.getX() + (paddle.getWidth() / 2) - (CannonBall.DIAMETRO / 2), paddle.getY() - CannonBall.DIAMETRO);
-            cannonBallActive = false; // Mantenerla inactiva al principio
-            System.out.println("Activando Atracción Magnética.");
+            // Nueva lógica para Atracción Magnética: Generar pelota en la parte inferior
+            int screenWidth = getWidth();
+            int ballStartX = screenWidth / 2; // Colocar la pelota en el centro de la pantalla
+            int ballStartY = getHeight() - 20; // Justo encima del límite inferior
+
+            Ball nuevaPelota = new Ball(ballStartX, ballStartY);
+            nuevaPelota.setyDir(-3); // Disparar la pelota hacia arriba
+            balls.add(nuevaPelota); // Añadir la nueva pelota a la lista
+            ((AtraccionMagnetica) powerUp).activar(balls);
+            System.out.println("Pelota disparada hacia arriba con Atracción Magnética.");
         } else if (powerUp instanceof CanonDeRebote) {
             // lógica de Cañón de Rebote
         } else if (powerUp instanceof RalentizarTiempo) {
@@ -332,7 +345,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         int paddleCenter = paddle.getX() + paddle.getWidth() / 2;
         int impactPoint = ball.getX() + ball.getDiametro() / 2;
         int distanceFromCenter = impactPoint - paddleCenter;
-        double angleFactor = 0.05;
+        double angleFactor = 0.10;
         ball.setxDir((int) (distanceFromCenter * angleFactor));
         ball.aumentarVelocidad();
     }

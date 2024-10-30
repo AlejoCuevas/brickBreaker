@@ -14,6 +14,8 @@ public class Generador {
         // Ajustar el número de filas y columnas según el nivel
         if (nivel == 3 || nivel == 4) {
             this.fila = (int) (screenWidth / 60) / 2; // Alcanzar la mitad de la pantalla
+        } else if (nivel == 5) { // Nivel bonus
+            this.fila = 7; // Puedes ajustar las filas según tu preferencia para el nivel bonus
         } else {
             this.fila = 5 + nivel;
         }
@@ -21,17 +23,21 @@ public class Generador {
         mapa = new Brick[fila][columna];
         Random random = new Random();
 
-        // Generación aleatoria de bloques
+        // Generación de bloques
         for (int i = 0; i < fila; i++) {
             for (int j = 0; j < columna; j++) {
-                // Determina si el bloque es destructible o indestructible
-                boolean esIndestructible = (i == fila - 1) || (random.nextDouble() < 0.50); // 75% de probabilidad de ser indestructible
+                boolean esIndestructible;
+                if (nivel == 5) { // Nivel bonus
+                    esIndestructible = false; // No hay ladrillos indestructibles en el nivel bonus
+                } else {
+                    esIndestructible = (i == fila - 1) || (random.nextDouble() < 0.50); // Probabilidad de ser indestructible
+                }
 
                 // Se generan bloques aleatorios
                 if (random.nextBoolean()) { // 50% de probabilidad de generar un bloque
                     mapa[i][j] = new Brick(j * 60 + 10, i * 30 + 50, 60, 30, esIndestructible);
                 } else {
-                    mapa[i][j] = null; // Sin bloque
+                    mapa[i][j] = null;
                 }
             }
         }

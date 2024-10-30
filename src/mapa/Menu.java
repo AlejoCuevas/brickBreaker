@@ -22,8 +22,8 @@ public class Menu extends JPanel implements ActionListener {
         jugarButton = new JButton("Jugar");
         salirButton = new JButton("Salir");
 
-        // Crear JComboBox para seleccionar el nivel
-        String[] niveles = {"Nivel 1", "Nivel 2", "Nivel 3", "Nivel 4"};
+        // Crear JComboBox para seleccionar el nivel, incluyendo el nivel bonus
+        String[] niveles = {"Nivel 1", "Nivel 2", "Nivel 3", "Nivel 4", "Nivel Bonus"};
         nivelComboBox = new JComboBox<>(niveles);
 
         jugarButton.addActionListener(this);
@@ -41,6 +41,7 @@ public class Menu extends JPanel implements ActionListener {
         gbc.gridy = 2;
         add(salirButton, gbc);
     }
+
 
     @Override
     protected void paintComponent(Graphics g) {

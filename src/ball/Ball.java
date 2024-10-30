@@ -56,6 +56,10 @@ public class Ball {
         xDir = i;
     }
 
+    public void setyDir(int j) { // Nuevo método
+        yDir = j;
+    }
+
     public void setX(int x) {
         this.x = x;
     }
