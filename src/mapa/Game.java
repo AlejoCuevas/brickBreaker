@@ -33,7 +33,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     private CannonBall cannonBall;
     private boolean cannonBallActive = false;
-
+    boolean isPaused = false;
 
     public Game(JFrame frame, int nivel) {
         this.frame = frame;
@@ -357,11 +357,27 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 cannonBallActive = true; // Activar el cañón cuando el jugador presiona la barra espaciadora
             }
         }
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            if (isPaused) {
+                timer.start();
+                System.out.println("Juego reanudado");
+            } else {
+                timer.stop();
+                System.out.println("Juego en pausa");
+            }
+            isPaused = !isPaused;
+
+        }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
 
+
+
+    }
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+
+    }
 }
