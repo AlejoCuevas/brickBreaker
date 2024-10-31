@@ -2,10 +2,10 @@ package powerup;
 
 import java.awt.*;
 
-public class CanonDeRebote extends PowerUp {
+public class FakePowerUp extends PowerUp {
 
 
-    public CanonDeRebote(int x, int y) {
+    public FakePowerUp(int x, int y) {
         super(x, y);
     }
 

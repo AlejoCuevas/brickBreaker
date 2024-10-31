@@ -90,14 +90,6 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     }
 
-    public void setFullscreen(JFrame frame) {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice graphicsDevice = ge.getDefaultScreenDevice();
-
-        frame.setUndecorated(true);
-        graphicsDevice.setFullScreenWindow(frame); // Cambiar a pantalla completa
-        frame.setVisible(true); // Hacerlo visible
-    }
 
 
 
@@ -270,7 +262,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             case 1:
                 return new AtraccionMagnetica(x, y);
             case 2:
-                return new CanonDeRebote(x, y);
+                return new FakePowerUp(x, y);
             case 3:
                 return new RalentizarTiempo(x, y);
             case 4:
@@ -300,7 +292,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             balls.add(nuevaPelota); // Añadir la nueva pelota a la lista
             ((AtraccionMagnetica) powerUp).activar(balls);
             System.out.println("Pelota disparada hacia arriba con Atracción Magnética.");
-        } else if (powerUp instanceof CanonDeRebote) {
+        } else if (powerUp instanceof FakePowerUp) {
             // lógica de Cañón de Rebote
         } else if (powerUp instanceof RalentizarTiempo) {
             activarRalentizarTiempo();
