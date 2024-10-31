@@ -15,7 +15,7 @@ public class Generador {
         if (nivel == 3 || nivel == 4) {
             this.fila = (int) (screenWidth / 60) / 2; // Alcanzar la mitad de la pantalla
         } else if (nivel == 5) { // Nivel bonus
-            this.fila = 7; // Puedes ajustar las filas según tu preferencia para el nivel bonus
+            this.fila = 7;
         } else {
             this.fila = 5 + nivel;
         }

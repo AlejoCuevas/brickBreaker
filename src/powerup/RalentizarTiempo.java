@@ -17,7 +17,6 @@ public class RalentizarTiempo extends PowerUp {
     public void activar() {
         // Lógica para ralentizar el tiempo
         System.out.println("Ralentizando el tiempo.");
-        // Aquí puedes modificar el temporizador del juego
     }
 
 }

@@ -20,7 +20,6 @@ public class AtraccionMagnetica extends PowerUp {
 
     }
 
-    // Método activador que recibe una lista de pelotas
     public void activar(List<Ball> balls) {
         System.out.println("Activando Atracción Magnética.");
 
